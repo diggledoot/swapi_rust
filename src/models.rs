@@ -2,7 +2,7 @@
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct RawCharacter {
     pub name: Option<String>,
     pub height: Option<String>,
@@ -27,7 +27,7 @@ pub struct Character {
     pub height: i32,
     pub gender: Option<String>,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct APIResponse {
     pub count: i32,
     pub next: Option<String>,

@@ -8,7 +8,10 @@ const SWAPI_PEOPLE_URL: &str = "https://swapi.dev/api/people";
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let raw_characters: Vec<RawCharacter> = get_characters(SWAPI_PEOPLE_URL.to_string()).await?;
-    println!("{:?}", raw_characters.len());
+    let height_characters: Vec<RawCharacter> = get_characters_with_height(&raw_characters).unwrap();
+    let no_height_characters: Vec<RawCharacter> =
+        get_characters_with_no_height(&raw_characters).unwrap();
+    println!("{:?}", no_height_characters);
     Ok(())
 }
 
@@ -25,4 +28,36 @@ async fn get_characters(url: String) -> Result<Vec<RawCharacter>, Box<dyn std::e
         response_next = api_response.next;
     }
     Ok(result)
+}
+
+fn get_characters_with_height(
+    characters: &[RawCharacter],
+) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
+    let mut result: Vec<RawCharacter> = Vec::new();
+    for character in characters.iter() {
+        if let Some(height) = &character.height {
+            if is_number(height.as_str()) {
+                result.push(character.clone())
+            }
+        }
+    }
+    Ok(result)
+}
+
+fn get_characters_with_no_height(
+    characters: &[RawCharacter],
+) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
+    let mut result: Vec<RawCharacter> = Vec::new();
+    for character in characters.iter() {
+        if let Some(height) = &character.height {
+            if !is_number(height.as_str()) {
+                result.push(character.clone())
+            }
+        }
+    }
+    Ok(result)
+}
+
+fn is_number(s: &str) -> bool {
+    s.parse::<i32>().is_ok()
 }
