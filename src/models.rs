@@ -25,14 +25,15 @@ pub struct RawCharacter {
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct OutputCharacter {
     pub gender: String,
-    pub characters: Vec<RawCharacter>,
+    pub characters: Vec<Character>,
 }
 
+#[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct Character {
     pub name: Option<String>,
-    pub height: i32,
-    pub gender: Option<String>,
+    pub height: Option<String>,
 }
+
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct APIResponse {
     pub count: i32,
