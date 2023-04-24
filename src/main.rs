@@ -4,7 +4,7 @@ use std::{fs::File, io::Write};
 
 use reqwest::Response;
 use serde_json::Error;
-use swapi::models::{APIResponse, RawCharacter};
+use swapi::models::{APIResponse, OutputCharacter, RawCharacter};
 
 const SWAPI_PEOPLE_URL: &str = "https://swapi.dev/api/people";
 
@@ -14,20 +14,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let genders: Vec<String> = extract_gender(&raw_characters).unwrap_or_else(|err| {
         panic!("Failed to extract gender string!");
     });
+    let mut output_characters: Vec<OutputCharacter> = Vec::new();
     for gender in genders.iter() {
-        println!("{:?}", gender);
+        let gendered_characters = sort_by_gender(&raw_characters, gender)
+            .unwrap_or_else(|err| panic!("Failed to sort gender!"));
+        let output_character: OutputCharacter = OutputCharacter {
+            gender: String::from(gender),
+            characters: gendered_characters,
+        };
+        output_characters.push(output_character);
+        // let height_characters: Vec<RawCharacter> = get_characters_with_height(&raw_characters)
+        //     .unwrap_or_else(|err| {
+        //         panic!("Failed to extract characters with height!");
+        //     });
+        // let no_height_characters: Vec<RawCharacter> =
+        //     get_characters_with_no_height(&raw_characters).unwrap_or_else(|err| {
+        //         panic!("Failed to extract characters with no height!");
+        //     });
     }
-    // let height_characters: Vec<RawCharacter> = get_characters_with_height(&raw_characters)
-    //     .unwrap_or_else(|err| {
-    //         panic!("Failed to extract characters with height!");
-    //     });
-    // let no_height_characters: Vec<RawCharacter> = get_characters_with_no_height(&raw_characters)
-    //     .unwrap_or_else(|err| {
-    //         panic!("Failed to extract characters with no height!");
-    //     });
-    // write_to_file("output.json", &raw_characters);
+
+    write_to_file("output.json", &output_characters);
 
     Ok(())
+}
+
+fn sort_by_gender(
+    raw_characters: &[RawCharacter],
+    gender_string: &String,
+) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
+    let mut result = Vec::new();
+    for character in raw_characters.iter() {
+        if let Some(gender) = &character.gender {
+            if gender.eq(gender_string) {
+                result.push(character.clone());
+            }
+        }
+    }
+    Ok(result)
 }
 
 fn extract_gender(characters: &[RawCharacter]) -> Result<Vec<String>, Box<dyn std::error::Error>> {
@@ -42,7 +65,7 @@ fn extract_gender(characters: &[RawCharacter]) -> Result<Vec<String>, Box<dyn st
     Ok(result)
 }
 
-fn write_to_file(file_name: &str, data: &Vec<RawCharacter>) {
+fn write_to_file(file_name: &str, data: &[OutputCharacter]) {
     let json: String = serde_json::to_string_pretty(&data)
         .unwrap_or_else(|err| panic!("Failed to convert data to String!"));
     let mut file: File =

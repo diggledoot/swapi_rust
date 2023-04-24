@@ -22,6 +22,12 @@ pub struct RawCharacter {
     pub edited: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Clone, Serialize)]
+pub struct OutputCharacter {
+    pub gender: String,
+    pub characters: Vec<RawCharacter>,
+}
+
 pub struct Character {
     pub name: Option<String>,
     pub height: i32,
