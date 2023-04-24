@@ -35,11 +35,11 @@ pub fn extract_gender(
 
 pub fn write_to_file(file_name: &str, data: &[OutputCharacter]) {
     let json: String = serde_json::to_string_pretty(&data)
-        .unwrap_or_else(|err| panic!("Failed to convert data to String!"));
+        .unwrap_or_else(|_err| panic!("Failed to convert data to String!"));
     let mut file: File =
-        File::create(file_name).unwrap_or_else(|err| panic!("Failed to create file!"));
+        File::create(file_name).unwrap_or_else(|_err| panic!("Failed to create file!"));
     file.write_all(json.as_bytes())
-        .unwrap_or_else(|err| panic!("Failed to write to file!"));
+        .unwrap_or_else(|_err| panic!("Failed to write to file!"));
 }
 
 pub async fn get_characters(url: String) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
