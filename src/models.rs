@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct RawCharacter {
     pub name: Option<String>,
     pub height: Option<String>,
@@ -27,7 +27,7 @@ pub struct Character {
     pub height: i32,
     pub gender: Option<String>,
 }
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct APIResponse {
     pub count: i32,
     pub next: Option<String>,

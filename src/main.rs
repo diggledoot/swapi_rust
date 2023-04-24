@@ -1,6 +1,9 @@
 #![allow(unused)]
 
+use std::{fs::File, io::Write};
+
 use reqwest::Response;
+use serde_json::Error;
 use swapi::models::{APIResponse, RawCharacter};
 
 const SWAPI_PEOPLE_URL: &str = "https://swapi.dev/api/people";
@@ -11,8 +14,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let height_characters: Vec<RawCharacter> = get_characters_with_height(&raw_characters).unwrap();
     let no_height_characters: Vec<RawCharacter> =
         get_characters_with_no_height(&raw_characters).unwrap();
-    println!("{:?}", no_height_characters);
+    print_to_file("output.json", &raw_characters);
+
     Ok(())
+}
+
+fn print_to_file(file_name: &str, data: &Vec<RawCharacter>) {
+    let json = serde_json::to_string_pretty(&data).unwrap();
+    let mut file = File::create(file_name).unwrap();
+    file.write_all(json.as_bytes()).unwrap();
 }
 
 async fn get_characters(url: String) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
