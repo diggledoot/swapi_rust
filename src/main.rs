@@ -1,7 +1,10 @@
+#![allow(dead_code)]
+
 use reqwest::Response;
 use swapi::models::{APIResponse, RawCharacter};
 
 const SWAPI_PEOPLE_URL: &str = "https://swapi.dev/api/people";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let raw_characters: Vec<RawCharacter> = get_characters(SWAPI_PEOPLE_URL.to_string()).await?;
