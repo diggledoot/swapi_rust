@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(unused)]
 
 use reqwest::Response;
 use swapi::models::{APIResponse, RawCharacter};
