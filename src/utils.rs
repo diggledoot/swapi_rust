@@ -1,4 +1,8 @@
-use std::{fs::File, io::Write};
+use std::{
+    collections::HashSet,
+    fs::File,
+    io::{BufWriter, Write},
+};
 
 use reqwest::Response;
 
@@ -6,39 +10,37 @@ use crate::models::{APIResponse, OutputCharacter, RawCharacter};
 
 pub fn sort_by_gender(
     raw_characters: &[RawCharacter],
-    gender_string: &String,
+    gender_string: &str,
 ) -> Result<Vec<RawCharacter>, Box<dyn std::error::Error>> {
-    let mut result = Vec::new();
-    for character in raw_characters.iter() {
-        if let Some(gender) = &character.gender {
-            if gender.eq(gender_string) {
-                result.push(character.clone());
-            }
-        }
-    }
+    let result: Vec<RawCharacter> = raw_characters
+        .iter()
+        .filter(|character| character.gender.as_ref().unwrap() == gender_string)
+        .cloned()
+        .collect();
     Ok(result)
 }
 
 pub fn extract_gender(
     characters: &[RawCharacter],
 ) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let mut result: Vec<String> = Vec::new();
-    for character in characters.iter() {
-        if let Some(gender) = &character.gender {
-            if !result.contains(gender) {
-                result.push(gender.clone());
-            }
-        }
-    }
+    let mut result: Vec<String> = characters
+        .iter()
+        .filter_map(|character| character.gender.clone())
+        .collect::<HashSet<String>>()
+        .into_iter()
+        .collect();
+    result.sort();
     Ok(result)
 }
 
 pub fn write_to_file(file_name: &str, data: &[OutputCharacter]) {
     let json: String = serde_json::to_string_pretty(&data)
         .unwrap_or_else(|_err| panic!("Failed to convert data to String!"));
-    let mut file: File =
+    let file: File =
         File::create(file_name).unwrap_or_else(|_err| panic!("Failed to create file!"));
-    file.write_all(json.as_bytes())
+    let mut writer = BufWriter::new(file);
+    writer
+        .write_all(json.as_bytes())
         .unwrap_or_else(|_err| panic!("Failed to write to file!"));
 }
 
